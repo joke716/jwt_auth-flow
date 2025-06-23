@@ -1,10 +1,7 @@
 package com.teddy.jwt_authflow.controllers;
 
 import com.teddy.jwt_authflow.config.PublicEndpoint;
-import com.teddy.jwt_authflow.dtos.UserCreateRequestDTO;
-import com.teddy.jwt_authflow.dtos.ExceptionResponseDTO;
-import com.teddy.jwt_authflow.dtos.UserDetailDTO;
-import com.teddy.jwt_authflow.dtos.UserUpdateRequestDTO;
+import com.teddy.jwt_authflow.dtos.*;
 import com.teddy.jwt_authflow.services.UserService;
 import com.teddy.jwt_authflow.utility.AuthenticatedUserIdProvider;
 import io.swagger.v3.oas.annotations.Operation;
@@ -86,4 +83,24 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PublicEndpoint
+    @PutMapping(value = "/reset-password", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "Resets user's current password",
+            description = "Non secured endpoint to help user reset their current password with a new password of choosing."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Password reset successfully",
+                    content = @Content(schema = @Schema(implementation = Void.class))),
+            @ApiResponse(responseCode = "401", description = "No user account exists with given email/current-password combination.",
+                    content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
+            @ApiResponse(responseCode = "422", description = "Provided new password is compromised",
+                    content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
+    })
+    public ResponseEntity<HttpStatus> resetPassword(
+            @Valid @RequestBody final ResetPasswordRequestDTO resetPasswordRequestDTO
+    ) {
+        userService.resetPassword(resetPasswordRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

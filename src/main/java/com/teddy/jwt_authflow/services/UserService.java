@@ -1,11 +1,13 @@
 package com.teddy.jwt_authflow.services;
 
 
+import com.teddy.jwt_authflow.dtos.ResetPasswordRequestDTO;
 import com.teddy.jwt_authflow.dtos.UserCreateRequestDTO;
 import com.teddy.jwt_authflow.dtos.UserDetailDTO;
 import com.teddy.jwt_authflow.dtos.UserUpdateRequestDTO;
 import com.teddy.jwt_authflow.entities.User;
 import com.teddy.jwt_authflow.exceptions.AccountAlreadyExistsException;
+import com.teddy.jwt_authflow.exceptions.InvalidCredentialsException;
 import com.teddy.jwt_authflow.repositories.UserRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +64,28 @@ public class UserService {
                 .status(user.getUserStatus().getValue())
                 .createdAt(user.getCreatedAt())
                 .build();
+    }
+
+    public void resetPassword(@NonNull final ResetPasswordRequestDTO resetPasswordRequestDTO) {
+        final var user = userRepository.findByEmailId(resetPasswordRequestDTO.getEmailId())
+                .orElseThrow(() -> new InvalidCredentialsException("No user exists with given email/current-password combination."));
+
+        final var existingEncodedPassword = user.getPassword();
+        final var plainTextCurrentPassword = resetPasswordRequestDTO.getCurrentPassword();
+        final var isCorrectPassword = passwordEncoder.matches(plainTextCurrentPassword, existingEncodedPassword);
+        if (Boolean.FALSE.equals(isCorrectPassword)) {
+            throw new InvalidCredentialsException("No user exists with given email/current-password combination.");
+        }
+
+        final var newPassword = resetPasswordRequestDTO.getNewPassword();
+//        final var isNewPasswordCompromised = compromisedPasswordChecker.check(newPassword).isCompromised();
+//        if (Boolean.TRUE.equals(isNewPasswordCompromised)) {
+//            throw new CompromisedPasswordException("New password selected is compromised and cannot be used.");
+//        }
+
+        final var encodedNewPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedNewPassword);
+        userRepository.save(user);
     }
 
     private User getUserById(@NonNull final UUID userId) {

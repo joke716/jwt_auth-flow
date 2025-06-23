@@ -3,6 +3,7 @@ package com.teddy.jwt_authflow.services;
 
 import com.teddy.jwt_authflow.dtos.UserCreateRequestDTO;
 import com.teddy.jwt_authflow.dtos.UserDetailDTO;
+import com.teddy.jwt_authflow.dtos.UserUpdateRequestDTO;
 import com.teddy.jwt_authflow.entities.User;
 import com.teddy.jwt_authflow.exceptions.AccountAlreadyExistsException;
 import com.teddy.jwt_authflow.repositories.UserRepository;
@@ -42,6 +43,13 @@ public class UserService {
         user.setEmailId(userCreationRequest.getEmailId());
         user.setPassword(encodedPassword);
 
+        userRepository.save(user);
+    }
+
+    public void update(@NonNull final UUID userId, @NonNull UserUpdateRequestDTO userUpdateRequestDTO) {
+        final var user = getUserById(userId);
+        user.setFirstName(userUpdateRequestDTO.getFirstName());
+        user.setLastName(userUpdateRequestDTO.getLastName());
         userRepository.save(user);
     }
 

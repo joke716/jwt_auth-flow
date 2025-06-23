@@ -1,0 +1,24 @@
+services:
+  jwt_auth_flow_database:
+    container_name: jwt_auth_flow_database
+    image: 'postgres:latest'
+    ports:
+      - "5439:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=username
+      - POSTGRES_DB=jwt_auth_flow_database
+      - PGDATA=/data/postgres
+    volumes:
+      - postgres:/data/postgres
+    restart: always
+
+#  banking_redis:
+#    container_name: bankingex_redis
+#    image: redis:latest
+#    ports:
+#      - "6378:63798"
+#    restart: unless-stopped
+
+volumes:
+  postgres:

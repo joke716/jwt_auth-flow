@@ -2,6 +2,7 @@ package com.teddy.jwt_authflow.services;
 
 
 import com.teddy.jwt_authflow.dtos.UserCreateRequestDTO;
+import com.teddy.jwt_authflow.dtos.UserDetailDTO;
 import com.teddy.jwt_authflow.entities.User;
 import com.teddy.jwt_authflow.exceptions.AccountAlreadyExistsException;
 import com.teddy.jwt_authflow.repositories.UserRepository;
@@ -9,6 +10,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -42,5 +45,19 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public UserDetailDTO getById(@NonNull final UUID userId) {
+        final var user = getUserById(userId);
+        return UserDetailDTO.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .emailId(user.getEmailId())
+                .status(user.getUserStatus().getValue())
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
+
+    private User getUserById(@NonNull final UUID userId) {
+        return userRepository.findById(userId).orElseThrow(IllegalStateException::new);
+    }
 
 }

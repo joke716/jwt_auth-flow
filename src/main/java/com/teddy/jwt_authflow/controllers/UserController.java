@@ -3,7 +3,9 @@ package com.teddy.jwt_authflow.controllers;
 import com.teddy.jwt_authflow.config.PublicEndpoint;
 import com.teddy.jwt_authflow.dtos.UserCreateRequestDTO;
 import com.teddy.jwt_authflow.dtos.ExceptionResponseDTO;
+import com.teddy.jwt_authflow.dtos.UserDetailDTO;
 import com.teddy.jwt_authflow.services.UserService;
+import com.teddy.jwt_authflow.utility.AuthenticatedUserIdProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,11 +15,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+    private final AuthenticatedUserIdProvider authenticatedUserIdProvider;
 
     @PublicEndpoint
     @PostMapping
@@ -45,5 +47,17 @@ public class UserController {
         userService.create(userCreateRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Retrieves current logged-in user's account details", description = "Private endpoint which retreives user account details against the Access-token JWT provided in headers")
+    @ApiResponse(responseCode = "200", description = "User account details retrieved successfully")
+    @PreAuthorize("hasAnyAuthority('userprofile.read', 'fullaccess')")
+    public ResponseEntity<UserDetailDTO> retrieveUser() {
+        final var userId = authenticatedUserIdProvider.getUserId();
+        final var userDetail = userService.getById(userId);
+        return ResponseEntity.ok(userDetail);
+    }
+
+
 
 }

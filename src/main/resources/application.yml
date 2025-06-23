@@ -80,7 +80,6 @@ com:
             AakRbn3qG8WNuzeWe2QMNkv33isrO+RGIh6uKJGw1WUiu+gSCNb99vzGFfydhiTd
             AQIDAQAB
             -----END PUBLIC KEY-----
-
           validity: 30
         refresh-token:
           validity: 120

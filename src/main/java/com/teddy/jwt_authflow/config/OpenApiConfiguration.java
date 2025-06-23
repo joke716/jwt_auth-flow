@@ -1,5 +1,6 @@
 package com.teddy.jwt_authflow.config;
 
+import com.teddy.jwt_authflow.utility.RefreshTokenHeaderProvider;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -23,8 +24,8 @@ public class OpenApiConfiguration {
     private static final String BEARER_AUTH_SCHEME = "Bearer";
 
     private static final String REFRESH_TOKEN_COMPONENT_NAME = "Refresh Token Header";
-//    private static final String REFRESH_TOKEN_HEADER = RefreshTokenHeaderProvider.REFRESH_TOKEN_HEADER;
-    private static final String REFRESH_TOKEN_HEADER = null;
+    private static final String REFRESH_TOKEN_HEADER = RefreshTokenHeaderProvider.REFRESH_TOKEN_HEADER;
+//    private static final String REFRESH_TOKEN_HEADER = null;
 
     @Bean
     public OpenAPI customOpenAPI() {

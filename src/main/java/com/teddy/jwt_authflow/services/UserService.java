@@ -20,7 +20,9 @@ public class UserService {
     public void create(@NonNull final UserCreateRequestDTO userCreationRequest) {
         final var emailId = userCreationRequest.getEmailId();
         final var userAccountExistsWithEmailId = userRepository.existsByEmailId(emailId);
+
         if (Boolean.TRUE.equals(userAccountExistsWithEmailId)) {
+            System.out.println("userAccountExistsWithEmailId = " + userAccountExistsWithEmailId);
             throw new AccountAlreadyExistsException("Account with provided email-id already exists");
         }
 

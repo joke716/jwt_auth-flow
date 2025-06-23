@@ -63,14 +63,13 @@ public class ApiEndpointSecurityInspector {
             }
         });
 
-        final var openApiEnable = openApiConfigurationProperties.getOpenApi().isEnabled();
-        if (Boolean.TRUE.equals(openApiEnable)) {
+        final var openApiEnabled = openApiConfigurationProperties.getOpenApi().isEnabled();
+        if (Boolean.TRUE.equals(openApiEnabled)) {
             publicGetEndpoints.addAll(SWAGGER_V3_PATHS);
         }
 
         final var actuatorEndpoints = getActuatorEndpoints();
         publicGetEndpoints.addAll(actuatorEndpoints);
-
     }
 
 
@@ -82,12 +81,6 @@ public class ApiEndpointSecurityInspector {
         return unsecuredApiPaths.stream().anyMatch(apiPath -> new AntPathMatcher().match(apiPath, request.getRequestURI()));
     }
 
-    /**
-     * Retrieves the list of unsecured API paths based on the provided HTTP method.
-     *
-     * @param httpMethod The HTTP method for which unsecured paths are to be retrieved.
-     * @return A list of unsecured API paths for the specified HTTP method.s
-     */
     private List<String> getUnsecuredApiPaths(@NonNull final HttpMethod httpMethod) {
         switch (httpMethod) {
             case GET:
@@ -100,7 +93,6 @@ public class ApiEndpointSecurityInspector {
                 return Collections.emptyList();
         }
     }
-
 
     private List<String> getActuatorEndpoints() {
         final var basePath = webEndpointProperties.getBasePath();

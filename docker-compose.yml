@@ -13,6 +13,14 @@ services:
       - postgres:/data/postgres
     restart: always
 
+  redis-cache:
+    container_name: redis-cache
+    image: redis:latest
+    ports:
+      - "6377:6379"
+    restart: unless-stopped
+    command: redis-server --requirepass "Password@123"
+
 #  banking_redis:
 #    container_name: bankingex_redis
 #    image: redis:latest

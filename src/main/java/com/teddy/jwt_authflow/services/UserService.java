@@ -1,5 +1,6 @@
 package com.teddy.jwt_authflow.services;
 
+
 import com.teddy.jwt_authflow.dtos.UserCreateRequestDTO;
 import com.teddy.jwt_authflow.entities.User;
 import com.teddy.jwt_authflow.exceptions.AccountAlreadyExistsException;
@@ -16,24 +17,27 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void createUser(@NonNull final UserCreateRequestDTO userCreateRequestDTO) {
-        final var emailId = userCreateRequestDTO.getEmailId();
+    public void create(@NonNull final UserCreateRequestDTO userCreationRequest) {
+        final var emailId = userCreationRequest.getEmailId();
         final var userAccountExistsWithEmailId = userRepository.existsByEmailId(emailId);
         if (Boolean.TRUE.equals(userAccountExistsWithEmailId)) {
-            // 에러 핸들링
-            throw new AccountAlreadyExistsException("Account with provided emailId already exists");
+            throw new AccountAlreadyExistsException("Account with provided email-id already exists");
         }
 
-        final var plainPassword = userCreateRequestDTO.getPassword();
+        final var plainTextPassword = userCreationRequest.getPassword();
+//        final var isPasswordCompromised = compromisedPasswordChecker.check(plainTextPassword).isCompromised();
+//        if (Boolean.TRUE.equals(isPasswordCompromised)) {
+//            throw new CompromisedPasswordException("The provided password is compromised and cannot be used for account creation.");
+//        }
 
         final var user = new User();
-        final var encodedPassword = passwordEncoder.encode(plainPassword);
-        user.setFirstName(userCreateRequestDTO.getFirstName());
-        user.setLastName(userCreateRequestDTO.getLastName());
-        user.setEmailId(emailId);
+        final var encodedPassword = passwordEncoder.encode(plainTextPassword);
+        user.setFirstName(userCreationRequest.getFirstName());
+        user.setLastName(userCreationRequest.getLastName());
+        user.setEmailId(userCreationRequest.getEmailId());
         user.setPassword(encodedPassword);
-        userRepository.save(user);
 
+        userRepository.save(user);
     }
 
 

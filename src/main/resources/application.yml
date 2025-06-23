@@ -19,3 +19,73 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6377
+      timeout: 60s
+      password: Password@123
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: "10000ms"
+
+
+
+com:
+  teddy:
+    jwtauthflow:
+      token:
+        access-token:
+          private-key: |-
+            -----BEGIN PRIVATE KEY-----
+            MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDGIHEryqOGAk4f
+            MYoUNUtc0rruqZK/9lMt6H4OGLN3fA5zOCMsdwecWBbkUOkNY9jMy4q7deyHPo2F
+            Ob4xgrkPrT4ajCPvQPp2a47j2PtKv2RzVvgjb6s2sg3hVoOuh7siHfp/chVICPs7
+            7pscxv3sIjjGBXGIecUgNlk0BZkgQk8AV5IL4CkZ6X+o2noBKBU9dSy8tlo8wPOf
+            VP0FvhfG5Ewzt6KTSB/HvJcxYvytvP2tH0DSMT3wEdhht+QljEH32A3Z5RcxsS0F
+            jccjGPkBqRFufeobxY27N5Z7ZAw2S/feKys75EYiHq4okbDVZSK76BII1v32/MYV
+            /J2GJN0BAgMBAAECggEASuE+BH/8l4xNfEqb1hFiXz2husvKE9UEEOi6o5dAVNtF
+            FtTTrl16OeOtGzNdMVtYN+aBk2H5OBAzKnPtZwbx7HPcceofNrCHOLRj98ctCk4V
+            p+XpuHLe8bgPuOeasx7HYhiUcRBr7KLAWSFP7Gtk0pcIgAbUpvDmyMrhoeCvw9nA
+            SH8t2/HQGHhCHZ+9zLxVeembOWdLjHihCXSNhmlxBwLcav9Rx4BCCzoKLqcS/nS2
+            Ns6e19l+XgJWry2FOXFCSPcnCzWG04l4PCrQ8yI491xQYXx9SgVCrzmy2CqXYDP8
+            07PbV06qR+DIYcCMpqEhRqNMPWlbhD/hWkol1spBBQKBgQD+Ktr+rGv8KRsVFMj2
+            pRVs4UUr6LKkhka/rQH0akL/z9UIjHEszr9wbRx+voD2XISP3DSCiAtsN40EqFfQ
+            uNgj2iRJ8HdDfmIMDbLgmlJOudN6qTSVY2sGPyRxbTmktPB2kjVCgTGvCbGr0m0j
+            eZrQeljyy21COmV/109QR71cXwKBgQDHjiVu8wRi6OK62FigmAcZslfoPWu/WRAy
+            X+0djsoIGGx8bYNJaNuPScxeWdZcC3V2qGyXgYg98Egr0Y7phl85g1uP4RJwqj3m
+            4Ed+kevR+8sMpirn0e2l1cMlspFkWEJ+KxOHuprCxILgWQw6hIZYgEok6CDuSqs/
+            JyXvtUhCnwKBgQCPF1FzT17796hnlewN76LASZLHxZnNRktOXfhbwfc2TauBxI9y
+            ynK8uLDyKg4wpKV82Fw3oJ/NrPiXRq8psub8SDNl7Rs3xE8uugeaq0brS3Lj+56+
+            +9mlCqdZtERflf5KwsV5S4LNKIf+U9ldv3iJJlgtWJmKT5YVAwKED99rwQKBgQCs
+            jxeBlHVjjlyZE4G4BR6GsvhfI9WrVjmyRc8Fszayv2P4SL6xWRIbGsa1g9vgJiyB
+            2exlKqaEYOYXthNtjjuDwToI9ah7cksq/R/1q/sOzjvsCTiq05Y7w9gHHh2pdsSw
+            01EFGnC/ISzHEVmItJZzqyPyPCRVyo3Ag3rDiLAeowKBgFqS0IxQGvu7LjWyUzI2
+            8ybYN4rqBHJygvE8LdG+FLxRlLdOWirg1b9OelNHMZY97zV0N3xtJwusq8TdXyuT
+            nYdAzmBAM214gDMnFdgCmFNkz5WMLdlTgPrrD/yAfJuqYwXuzmdlBBoxkrkIUgVu
+            50zxb5ZzAczAhZh1h+WQ6n3Q
+            -----END PRIVATE KEY-----
+
+          public-key: |-
+            -----BEGIN PUBLIC KEY-----
+            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxiBxK8qjhgJOHzGKFDVL
+            XNK67qmSv/ZTLeh+Dhizd3wOczgjLHcHnFgW5FDpDWPYzMuKu3Xshz6NhTm+MYK5
+            D60+Gowj70D6dmuO49j7Sr9kc1b4I2+rNrIN4VaDroe7Ih36f3IVSAj7O+6bHMb9
+            7CI4xgVxiHnFIDZZNAWZIEJPAFeSC+ApGel/qNp6ASgVPXUsvLZaPMDzn1T9Bb4X
+            xuRMM7eik0gfx7yXMWL8rbz9rR9A0jE98BHYYbfkJYxB99gN2eUXMbEtBY3HIxj5
+            AakRbn3qG8WNuzeWe2QMNkv33isrO+RGIh6uKJGw1WUiu+gSCNb99vzGFfydhiTd
+            AQIDAQAB
+            -----END PUBLIC KEY-----
+
+          validity: 30
+        refresh-token:
+          validity: 120
+      open-api:
+        enabled: true
+        api-version: 1.0.0
+        title: TeddyAPI
+        description: Java Backend application using Spring-security to implement JWT based Authentication and Authorization

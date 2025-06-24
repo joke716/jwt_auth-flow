@@ -3,12 +3,16 @@ package com.teddy.jwt_authflow.dtos;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.teddy.jwt_authflow.entities.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -32,5 +36,8 @@ public class UserCreateRequestDTO {
     @NotBlank(message = "password must not be empty")
     @Schema(requiredMode = RequiredMode.REQUIRED, description = "secure password to enable user login", example = "PasswOrd123!")
     private String password;
+
+    @Schema(requiredMode = RequiredMode.NOT_REQUIRED, description = "roles of user", example = "[\"USER\"]")
+    private Set<Role> roles = new HashSet<>();
 
 }

@@ -27,7 +27,8 @@ public class UserController {
     private final UserService userService;
     private final AuthenticatedUserIdProvider authenticatedUserIdProvider;
 
-    @PublicEndpoint
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     @Operation(
             summary = "Creates a user account",
@@ -74,7 +75,7 @@ public class UserController {
             description = "User account details updated successfully",
             content = @Content(schema = @Schema(implementation = Void.class))
     )
-    @PreAuthorize("hasAnyAuthority('userprofile.update', 'fullaccess')")
+//    @PreAuthorize("hasAnyAuthority('userprofile.update', 'fullaccess')")
     public ResponseEntity<HttpStatus> updateUser(
             @Valid @RequestBody final UserUpdateRequestDTO userUpdateRequestDTO
     ) {
@@ -91,7 +92,7 @@ public class UserController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Password reset successfully",
-                    content = @Content(schema = @Schema(implementation = Void.class))),
+                    content = @Content(schema = @Schema(implementation = void.class))),
             @ApiResponse(responseCode = "401", description = "No user account exists with given email/current-password combination.",
                     content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class))),
             @ApiResponse(responseCode = "422", description = "Provided new password is compromised",
@@ -112,7 +113,7 @@ public class UserController {
     @ApiResponse(
             responseCode = "204",
             description = "User profile successfully deactivated",
-            content = @Content(schema = @Schema(implementation = Void.class))
+            content = @Content(schema = @Schema(implementation = void.class))
     )
     @PreAuthorize("hasAnyAuthority('userprofile.update', 'fullaccess')")
     public ResponseEntity<HttpStatus> deactivateUser() {

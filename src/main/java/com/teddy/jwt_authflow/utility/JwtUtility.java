@@ -45,16 +45,21 @@ public class JwtUtility {
     }
 
     public String generateAccessToken(@NonNull final User user) {
-        final var jti = String.valueOf(UUID.randomUUID());
-        final var audience = String.valueOf(user.getId());
+        final var jti = UUID.randomUUID().toString();
+        final var audience = user.getId().toString();
         final var accessTokenValidity = tokenConfigurationProperties.getAccessToken().getValidity();
         final var expiration = TimeUnit.MINUTES.toMillis(accessTokenValidity);
-        final var currentTimestamp = new Date(System.currentTimeMillis());
-        final var expirationTimestamp = new Date(System.currentTimeMillis() + expiration);
-        final var scopes = user.getUserStatus().getScopes().stream().collect(Collectors.joining(StringUtils.SPACE));
+        final var currentTimestamp = new Date();
+        final var expirationTimestamp = new Date(currentTimestamp.getTime() + expiration);
 
-        final var claims = new HashMap<String, String>();
-        claims.put(SCOPE_CLAIM_NAME, scopes);
+        // ✅ 역할 기반 권한 (ADMIN, USER, MANAGER 등)
+        final var roles = user.getRoles() // 예: Set<UserRole>
+                .stream()
+                .map(Enum::name)  // "ADMIN", "USER"
+                .collect(Collectors.toList());
+
+        final var claims = new HashMap<String, Object>();
+        claims.put("roles", roles);     // ✅ roles만 포함
 
         return Jwts.builder()
                 .claims(claims)
@@ -78,10 +83,10 @@ public class JwtUtility {
     }
 
     public List<GrantedAuthority> getAuthority(@NonNull final String token) {
-        final var scopes = extractClaim(token, claims -> claims.get(SCOPE_CLAIM_NAME, String.class));
+        final List<String> roles = extractClaim(token, claims -> claims.get("roles", List.class));
 
-        return Arrays.stream(scopes.split(StringUtils.SPACE))
-                .map(SimpleGrantedAuthority::new)
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role)) // "ROLE_ADMIN"
                 .collect(Collectors.toList());
     }
 

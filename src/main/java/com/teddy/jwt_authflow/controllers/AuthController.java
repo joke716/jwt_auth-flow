@@ -1,10 +1,7 @@
 package com.teddy.jwt_authflow.controllers;
 
 import com.teddy.jwt_authflow.config.PublicEndpoint;
-import com.teddy.jwt_authflow.dtos.TokenSuccessResponseDTO;
-import com.teddy.jwt_authflow.dtos.UserCreateRequestDTO;
-import com.teddy.jwt_authflow.dtos.UserLoginRequestDTO;
-import com.teddy.jwt_authflow.dtos.ExceptionResponseDTO;
+import com.teddy.jwt_authflow.dtos.*;
 import com.teddy.jwt_authflow.exceptions.TokenVerificationException;
 import com.teddy.jwt_authflow.services.AuthenticationService;
 import com.teddy.jwt_authflow.services.UserService;
@@ -46,11 +43,17 @@ public class AuthController {
             @ApiResponse(responseCode = "422", description = "Provided password is compromised",
                     content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
     })
-    public ResponseEntity<HttpStatus> craeteUserAccount(
+    public ResponseEntity<ApiResponseDTO<HttpStatus>> craeteUserAccount(
             @Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO
     ) {
         userService.create(userCreateRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        ApiResponseDTO<HttpStatus> response = ApiResponseDTO.<HttpStatus>builder()
+                .statusCode(HttpStatus.CREATED.value())
+                .message("User account created successfully")
+                .data(HttpStatus.CREATED)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PublicEndpoint
@@ -66,11 +69,16 @@ public class AuthController {
             @ApiResponse(responseCode = "422", description = "Password has been compromised",
                     content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
     })
-    public ResponseEntity<TokenSuccessResponseDTO> loginUser(
+    public ResponseEntity<ApiResponseDTO<TokenSuccessResponseDTO>> loginUser(
             @Valid @RequestBody final UserLoginRequestDTO userLoginRequestDTO
     ) {
         final var tokenResponse = authenticationService.login(userLoginRequestDTO);
-        return ResponseEntity.ok(tokenResponse);
+        ApiResponseDTO<TokenSuccessResponseDTO> response = ApiResponseDTO.<TokenSuccessResponseDTO>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("User account get loade successfully")
+                .data(tokenResponse)
+                .build();
+        return ResponseEntity.ok(response);
     }
 
     @PublicEndpoint

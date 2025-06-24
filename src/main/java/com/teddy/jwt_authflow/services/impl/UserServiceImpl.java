@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +78,11 @@ public class UserServiceImpl implements UserService {
                 .lastName(user.getLastName())
                 .emailId(user.getEmailId())
                 .status(user.getUserStatus().getValue())
+                .roles(user.getRoles()
+                        .stream()
+                        .map(Enum::name)
+                        .collect(Collectors.toSet())
+                )
                 .createdAt(user.getCreatedAt())
                 .build();
     }

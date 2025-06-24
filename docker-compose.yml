@@ -12,6 +12,8 @@ services:
     volumes:
       - postgres:/data/postgres
     restart: always
+    networks:
+      - teddy-net
 
   redis-cache:
     container_name: redis-cache
@@ -20,13 +22,36 @@ services:
       - "6377:6379"
     restart: unless-stopped
     command: redis-server --requirepass "Password@123"
+    networks:
+      - teddy-net
 
-#  banking_redis:
-#    container_name: bankingex_redis
-#    image: redis:latest
-#    ports:
-#      - "6378:63798"
-#    restart: unless-stopped
+  jwt_auth_flow_backend:
+    container_name: jwt_auth_flow_backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8090:8090"
+    depends_on:
+      - jwt_auth_flow_database
+      - redis-cache
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://jwt_auth_flow_database:5432/jwt_auth_flow_database
+      - SPRING_DATASOURCE_USERNAME=username
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_REDIS_HOST=redis-cache
+      - SPRING_REDIS_PORT=6379
+      - SPRING_REDIS_PASSWORD=Password@123
+    command: mvn spring-boot:run -Dspring-boot.run.fork=false
+    volumes:
+      - .:/backend
+    working_dir: /backend
+    networks:
+      - teddy-net
 
 volumes:
   postgres:
+
+networks:
+  teddy-net:
+    driver: bridge

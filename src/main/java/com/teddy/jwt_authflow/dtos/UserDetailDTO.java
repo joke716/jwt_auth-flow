@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Builder
@@ -21,5 +22,6 @@ public class UserDetailDTO {
     private String lastName;
     private String emailId;
     private String status;
+    private Set<String> roles;
     private LocalDateTime createdAt;
 }

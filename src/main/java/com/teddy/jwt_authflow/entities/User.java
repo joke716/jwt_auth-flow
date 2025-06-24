@@ -1,5 +1,6 @@
 package com.teddy.jwt_authflow.entities;
 
+import com.teddy.jwt_authflow.common.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,11 +15,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "USERS")
-public class User {
-    @Id
-    @Setter(AccessLevel.NONE)
-    @Column(name = "id", nullable = false, unique = true)
-    private UUID id;
+public class User extends AbstractEntity {
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -42,15 +39,9 @@ public class User {
     @Column(name = "status", nullable = false)
     private UserStatus userStatus;
 
-    @Setter(AccessLevel.NONE)
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
     @PrePersist
     void onCreate() {
-        this.id = UUID.randomUUID();
         this.userStatus = UserStatus.PENDING_APPROVAL;
-        this.createdAt = LocalDateTime.now();
     }
 
 }

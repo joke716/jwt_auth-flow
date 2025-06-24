@@ -6,9 +6,9 @@ spring:
     name: jwt_auth-flow
 
   datasource:
-    url: jdbc:postgresql://localhost:5439/jwt_auth_flow_database
-    username: username
-    password: password
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -22,10 +22,10 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 6377
+      host: ${SPRING_REDIS_HOST}
+      port: ${SPRING_REDIS_PORT}
+      password: ${SPRING_REDIS_PASSWORD}
       timeout: 60s
-      password: Password@123
       lettuce:
         pool:
           max-active: 8

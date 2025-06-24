@@ -42,12 +42,19 @@ public class UserController {
             @ApiResponse(responseCode = "422", description = "Provided password is compromised",
                     content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
     })
-    public ResponseEntity<HttpStatus> craeteUserAccount(
+    public ResponseEntity<ApiResponseDTO<HttpStatus>> craeteUserAccount(
             @Valid @RequestBody UserCreateRequestDTO userCreateRequestDTO
     ) {
         userService.create(userCreateRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        ApiResponseDTO<HttpStatus> response = ApiResponseDTO.<HttpStatus>builder()
+                .statusCode(HttpStatus.CREATED.value())
+                .message("User account created successfully")
+                .data(HttpStatus.CREATED)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
@@ -58,11 +65,16 @@ public class UserController {
             responseCode = "200",
             description = "User account details retrieved successfully"
     )
-    @PreAuthorize("hasAnyAuthority('userprofile.read', 'fullaccess')")
-    public ResponseEntity<UserDetailDTO> retrieveUser() {
+//    @PreAuthorize("hasAnyAuthority('userprofile.read', 'fullaccess')")
+    public ResponseEntity<ApiResponseDTO<UserDetailDTO>> retrieveUser() {
         final var userId = authenticatedUserIdProvider.getUserId();
         final var userDetail = userService.getById(userId);
-        return ResponseEntity.ok(userDetail);
+        ApiResponseDTO<UserDetailDTO> response = ApiResponseDTO.<UserDetailDTO>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("User account details retrieved successfully")
+                .data(userDetail)
+                .build();
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -76,12 +88,18 @@ public class UserController {
             content = @Content(schema = @Schema(implementation = Void.class))
     )
 //    @PreAuthorize("hasAnyAuthority('userprofile.update', 'fullaccess')")
-    public ResponseEntity<HttpStatus> updateUser(
+    public ResponseEntity<ApiResponseDTO<HttpStatus>> updateUser(
             @Valid @RequestBody final UserUpdateRequestDTO userUpdateRequestDTO
     ) {
         final var userId = authenticatedUserIdProvider.getUserId();
         userService.update(userId, userUpdateRequestDTO);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        ApiResponseDTO<HttpStatus> response = ApiResponseDTO.<HttpStatus>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("User account details updated successfully")
+                .data(HttpStatus.OK)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PublicEndpoint
@@ -98,11 +116,17 @@ public class UserController {
             @ApiResponse(responseCode = "422", description = "Provided new password is compromised",
                     content = @Content(schema = @Schema(implementation = ExceptionResponseDTO.class)))
     })
-    public ResponseEntity<HttpStatus> resetPassword(
+    public ResponseEntity<ApiResponseDTO<HttpStatus>> resetPassword(
             @Valid @RequestBody final ResetPasswordRequestDTO resetPasswordRequestDTO
     ) {
         userService.resetPassword(resetPasswordRequestDTO);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        ApiResponseDTO<HttpStatus> response = ApiResponseDTO.<HttpStatus>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Resets user's current password")
+                .data(HttpStatus.OK)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping(value = "/deactivate")
@@ -116,10 +140,16 @@ public class UserController {
             content = @Content(schema = @Schema(implementation = void.class))
     )
     @PreAuthorize("hasAnyAuthority('userprofile.update', 'fullaccess')")
-    public ResponseEntity<HttpStatus> deactivateUser() {
+    public ResponseEntity<ApiResponseDTO<HttpStatus>> deactivateUser() {
         final var userId = authenticatedUserIdProvider.getUserId();
         userService.deactivate(userId);
-        return ResponseEntity.noContent().build();
+        ApiResponseDTO<HttpStatus> response = ApiResponseDTO.<HttpStatus>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("User profile successfully deactivated")
+                .data(HttpStatus.NO_CONTENT)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
 
     }
 }

@@ -103,4 +103,22 @@ public class UserController {
         userService.resetPassword(resetPasswordRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @DeleteMapping(value = "/deactivate")
+    @Operation(
+            summary = "Deactivates current logged-in user's profile",
+            description = "Deactivates user's profile: can only be undone by praying to a higher power or contacting our vanished customer support."
+    )
+    @ApiResponse(
+            responseCode = "204",
+            description = "User profile successfully deactivated",
+            content = @Content(schema = @Schema(implementation = Void.class))
+    )
+    @PreAuthorize("hasAnyAuthority('userprofile.update', 'fullaccess')")
+    public ResponseEntity<HttpStatus> deactivateUser() {
+        final var userId = authenticatedUserIdProvider.getUserId();
+        userService.deactivate(userId);
+        return ResponseEntity.noContent().build();
+
+    }
 }

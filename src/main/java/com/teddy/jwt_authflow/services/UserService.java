@@ -6,6 +6,7 @@ import com.teddy.jwt_authflow.dtos.UserCreateRequestDTO;
 import com.teddy.jwt_authflow.dtos.UserDetailDTO;
 import com.teddy.jwt_authflow.dtos.UserUpdateRequestDTO;
 import com.teddy.jwt_authflow.entities.User;
+import com.teddy.jwt_authflow.entities.UserStatus;
 import com.teddy.jwt_authflow.exceptions.AccountAlreadyExistsException;
 import com.teddy.jwt_authflow.exceptions.InvalidCredentialsException;
 import com.teddy.jwt_authflow.repositories.UserRepository;
@@ -22,6 +23,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenRevocationService tokenRevocationService;
 
     public void create(@NonNull final UserCreateRequestDTO userCreationRequest) {
         final var emailId = userCreationRequest.getEmailId();
@@ -86,6 +88,14 @@ public class UserService {
         final var encodedNewPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encodedNewPassword);
         userRepository.save(user);
+    }
+
+    public void deactivate(@NonNull final UUID userId) {
+        final var user = getUserById(userId);
+        user.setUserStatus(UserStatus.DEACTIVATED);
+        userRepository.save(user);
+
+        tokenRevocationService.revoke();
     }
 
     private User getUserById(@NonNull final UUID userId) {

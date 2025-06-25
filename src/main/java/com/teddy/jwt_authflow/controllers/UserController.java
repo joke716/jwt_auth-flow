@@ -12,11 +12,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +29,25 @@ public class UserController {
 
     private final UserService userService;
     private final AuthenticatedUserIdProvider authenticatedUserIdProvider;
+
+
+    @PublicEndpoint
+    @GetMapping("/all")
+    @Operation(
+            summary = "Retrieves all user records",
+            description = "Retrieves details of all users."
+    )
+    @ApiResponse(responseCode = "200", description = "User records retrieved successfully.")
+    public ResponseEntity<ApiResponseDTO<List<UserDetailDTO>>> retrieveAll() {
+        final var users = userService.retrieve();
+        ApiResponseDTO<List<UserDetailDTO>> response = ApiResponseDTO.<List<UserDetailDTO>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("Retrieves all user records")
+                .data(users)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
 
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -88,15 +110,15 @@ public class UserController {
             content = @Content(schema = @Schema(implementation = Void.class))
     )
 //    @PreAuthorize("hasAnyAuthority('userprofile.update', 'fullaccess')")
-    public ResponseEntity<ApiResponseDTO<HttpStatus>> updateUser(
+    public ResponseEntity<ApiResponseDTO<UserDetailDTO>> updateUser(
             @Valid @RequestBody final UserUpdateRequestDTO userUpdateRequestDTO
     ) {
         final var userId = authenticatedUserIdProvider.getUserId();
-        userService.update(userId, userUpdateRequestDTO);
-        ApiResponseDTO<HttpStatus> response = ApiResponseDTO.<HttpStatus>builder()
+        UserDetailDTO updatedUser = userService.update(userId, userUpdateRequestDTO);
+        ApiResponseDTO<UserDetailDTO> response = ApiResponseDTO.<UserDetailDTO>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("User account details updated successfully")
-                .data(HttpStatus.OK)
+                .data(updatedUser)
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -129,6 +151,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+
+
     @DeleteMapping(value = "/deactivate")
     @Operation(
             summary = "Deactivates current logged-in user's profile",
@@ -139,7 +163,7 @@ public class UserController {
             description = "User profile successfully deactivated",
             content = @Content(schema = @Schema(implementation = void.class))
     )
-    @PreAuthorize("hasAnyAuthority('userprofile.update', 'fullaccess')")
+//    @PreAuthorize("hasAnyAuthority('userprofile.update', 'fullaccess')")
     public ResponseEntity<ApiResponseDTO<HttpStatus>> deactivateUser() {
         final var userId = authenticatedUserIdProvider.getUserId();
         userService.deactivate(userId);

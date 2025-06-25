@@ -34,7 +34,7 @@ public class UserCreateRequestDTO {
 
 
     @NotBlank(message = "password must not be empty")
-    @Schema(requiredMode = RequiredMode.REQUIRED, description = "secure password to enable user login", example = "PasswOrd123!")
+    @Schema(requiredMode = RequiredMode.REQUIRED, description = "secure password to enable user login", example = "Passw0rd123!")
     private String password;
 
     @Schema(requiredMode = RequiredMode.NOT_REQUIRED, description = "roles of user", example = "[\"USER\"]")

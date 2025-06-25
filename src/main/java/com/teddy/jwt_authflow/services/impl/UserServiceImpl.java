@@ -15,9 +15,13 @@ import com.teddy.jwt_authflow.services.UserService;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -42,10 +46,6 @@ public class UserServiceImpl implements UserService {
         }
 
         final var plainTextPassword = userCreateRequest.getPassword();
-//        final var isPasswordCompromised = compromisedPasswordChecker.check(plainTextPassword).isCompromised();
-//        if (Boolean.TRUE.equals(isPasswordCompromised)) {
-//            throw new CompromisedPasswordException("The provided password is compromised and cannot be used for account creation.");
-//        }
 
         if (userCreateRequest.getRoles() == null || userCreateRequest.getRoles().isEmpty()) {
             userCreateRequest.setRoles(Set.of(Role.USER));
@@ -62,14 +62,55 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+//    @CachePut(value = "userById", key = "#userId")
+//    @Override
+//    public void update(@NonNull UUID userId, @NonNull UserUpdateRequestDTO userUpdateRequestDTO) {
+//        final var user = getUserById(userId);
+//        user.setFirstName(userUpdateRequestDTO.getFirstName());
+//        user.setLastName(userUpdateRequestDTO.getLastName());
+//        userRepository.save(user);
+//    }
+    @CachePut(value = "userById", key = "#userId")
     @Override
-    public void update(@NonNull UUID userId, @NonNull UserUpdateRequestDTO userUpdateRequestDTO) {
+    public UserDetailDTO update(@NonNull UUID userId, @NonNull UserUpdateRequestDTO userUpdateRequestDTO) {
         final var user = getUserById(userId);
         user.setFirstName(userUpdateRequestDTO.getFirstName());
         user.setLastName(userUpdateRequestDTO.getLastName());
         userRepository.save(user);
+
+        return UserDetailDTO.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .emailId(user.getEmailId())
+                .status(user.getUserStatus().getValue())
+                .roles(user.getRoles().stream().map(Enum::name).collect(Collectors.toSet()))
+                .createdAt(user.getCreatedAt())
+                .build();
     }
 
+    @Cacheable(value = "users")
+    @Override
+    public List<UserDetailDTO> retrieve() {
+        System.out.println("📦 DB에서 사용자 목록 조회 (캐시가 없을 경우만 호출)");
+        final var users = userRepository.findAll();
+        return users
+                .stream()
+                .map(user -> UserDetailDTO.builder()
+                        .firstName(user.getFirstName())
+                        .lastName(user.getLastName())
+                        .emailId(user.getEmailId())
+                        .status(user.getUserStatus().getValue())
+                        .roles(user.getRoles()
+                                .stream()
+                                .map(Enum::name)
+                                .collect(Collectors.toSet())
+                        )
+                        .createdAt(user.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Cacheable(value = "userById", key = "#userId")
     @Override
     public UserDetailDTO getById(@NonNull UUID userId) {
         final var user = getUserById(userId);
@@ -87,10 +128,13 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+//    @CacheEvict(value = "userById", key = "#user.id")
     @Override
     public void resetPassword(@NonNull ResetPasswordRequestDTO resetPasswordRequestDTO) {
         final var user = userRepository.findByEmailId(resetPasswordRequestDTO.getEmailId())
                 .orElseThrow(() -> new InvalidCredentialsException("No user exists with given email/current-password combination."));
+
+        final var userId = user.getId();
 
         final var existingEncodedPassword = user.getPassword();
         final var plainTextCurrentPassword = resetPasswordRequestDTO.getCurrentPassword();
@@ -100,24 +144,20 @@ public class UserServiceImpl implements UserService {
         }
 
         final var newPassword = resetPasswordRequestDTO.getNewPassword();
-//        final var isNewPasswordCompromised = compromisedPasswordChecker.check(newPassword).isCompromised();
-//        if (Boolean.TRUE.equals(isNewPasswordCompromised)) {
-//            throw new CompromisedPasswordException("New password selected is compromised and cannot be used.");
-//        }
-
         final var encodedNewPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encodedNewPassword);
         userRepository.save(user);
     }
 
+    @CacheEvict(cacheNames = {"userById", "users"}, key = "#userId", allEntries = true)
     @Override
     public void deactivate(@NonNull UUID userId) {
         final var user = getUserById(userId);
         user.setUserStatus(UserStatus.DEACTIVATED);
         userRepository.save(user);
-
         tokenRevocationService.revoke();
     }
+
 
     private User getUserById(@NonNull final UUID userId) {
         return userRepository.findById(userId).orElseThrow(IllegalStateException::new);

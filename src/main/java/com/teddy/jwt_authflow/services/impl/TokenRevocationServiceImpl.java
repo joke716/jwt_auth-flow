@@ -6,6 +6,7 @@ import com.teddy.jwt_authflow.utility.JwtUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -29,9 +30,11 @@ public class TokenRevocationServiceImpl implements TokenRevocationService {
         cacheManager.save(jti, ttl);
     }
 
+
     @Override
     public boolean isRevoked(@NonNull String authHeader) {
         final var jti = jwtUtility.getJti(authHeader);
         return cacheManager.isPresent(jti);
     }
+
 }

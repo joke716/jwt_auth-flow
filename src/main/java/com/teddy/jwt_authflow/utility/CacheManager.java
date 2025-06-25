@@ -45,4 +45,14 @@ public class CacheManager {
         return Optional.of(result);
     }
 
+    public void evict(@NonNull final String key) {
+        Boolean deleted = redisTemplate.delete(key);
+        if (Boolean.TRUE.equals(deleted)) {
+            log.info("Evicted cached key '{}'", key);
+        } else {
+            log.info("No key '{}' found to evict", key);
+        }
+    }
+
 }
+

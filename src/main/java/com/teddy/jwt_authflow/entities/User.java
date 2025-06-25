@@ -37,11 +37,6 @@ public class User extends AbstractEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private UserStatus userStatus;
-
-    @PrePersist
-    void onCreate() {
-        this.userStatus = UserStatus.PENDING_APPROVAL;
-    }
+    private UserStatus userStatus = UserStatus.PENDING_APPROVAL;
 
 }

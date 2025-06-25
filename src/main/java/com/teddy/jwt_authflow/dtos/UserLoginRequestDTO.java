@@ -21,7 +21,7 @@ public class UserLoginRequestDTO {
 
 
     @NotBlank(message = "password must not be empty")
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = "secure password to enable user login", example = "PasswOrd123!")
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = "secure password to enable user login", example = "Passw0rd123!")
     private String password;
 
 }
